@@ -17,9 +17,9 @@ resource "aws_internet_gateway" "gw" {
 }
 
 resource "aws_subnet" "new_subnet" {
-  vpc_id            = aws_vpc.new_vpc.id
-  cidr_block        = "10.0.1.0/24"
-  availability_zone = "us-east-1a"
+  vpc_id                  = aws_vpc.new_vpc.id
+  cidr_block              = "10.0.1.0/24"
+  availability_zone       = "us-east-1a"
   map_public_ip_on_launch = true
 
   tags = {
@@ -52,11 +52,11 @@ resource "aws_security_group" "subnet_security_group" {
   }
 
   egress {
-  from_port   = 0
-  to_port     = 0
-  protocol    = "-1"
-  cidr_blocks = ["0.0.0.0/0"]
-}
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
 
 }
 
@@ -88,9 +88,11 @@ resource "aws_instance" "web" {
   vpc_security_group_ids = [aws_security_group.subnet_security_group.id]
   key_name               = aws_key_pair.default.key_name
 
-  user_data = templatefile("./scripts/setup_env.tpl", {
-    user_name = var.user_name
+  user_data = templatefile("${path.module}/scripts/setup_env.tpl", {
+    user_name     = var.user_name
+    playbook_data = file("${path.module}/playbook.yml")
   })
+
 
   tags = {
     Name = "VmTest"
