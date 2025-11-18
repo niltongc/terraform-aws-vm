@@ -4,6 +4,8 @@
 
   vars:
     user_name: "{{ user_name | default('ubuntu') }}"
+    install_dir: "/usr/local/bin"
+    minikube_version: "latest"
 
   tasks:
     - name: Install required system packages
@@ -47,10 +49,34 @@
         groups: docker
         append: yes
 
-    - name: Apply new group membership without relogin
-      shell: newgrp docker
-      args:
-        executable: /bin/bash
-      become_user: "{{ user_name }}"
-      ignore_errors: true
+    - name: Get latest stable version of kubectl
+      shell: curl -L -s https://dl.k8s.io/release/stable.txt
+      register: kubectl_latest
 
+    - name: Download kubectl binary
+      ansible.builtin.get_url:
+        url: "https://dl.k8s.io/{{ kubectl_latest.stdout }}/bin/linux/amd64/kubectl"
+        dest: "/tmp/kubectl"
+        mode: '0755'
+
+    - name: Move kubectl to install directory
+      ansible.builtin.copy:
+        src: "/tmp/kubectl"
+        dest: "{{ install_dir }}/kubectl"
+        owner: root
+        group: root
+        mode: '0755'
+        remote_src: yes
+
+    - name: Baixar Minikube
+      get_url:
+        url: https://storage.googleapis.com/minikube/releases/latest/minikube-linux-amd64
+        dest: /tmp/minikube-linux-amd64
+        mode: '0755'
+
+    - name: Instalar Minikube
+      copy:
+        src: /tmp/minikube-linux-amd64
+        dest: /usr/local/bin/minikube
+        remote_src: yes
+        mode: '0755'
