@@ -90,7 +90,7 @@ resource "aws_instance" "web" {
 
   user_data = templatefile("${path.module}/scripts/setup_env.tpl", {
     user_name     = var.user_name
-    playbook_data = file("${path.module}/playbook.yml")
+    playbook_data = file("${path.module}/ansible/playbook.yml")
   })
 
 

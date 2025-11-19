@@ -13,6 +13,9 @@ cat > /tmp/playbook.yml <<"EOF"
 ${playbook_data}
 EOF
 
+mkdir -p /etc/ansible/roles
+cp -R /tmp/roles/* /etc/ansible/roles/
+
 # Executes playbook locally
 ansible-playbook -i "localhost," -c local /tmp/playbook.yml --extra-vars "user_name=${user_name}"
 

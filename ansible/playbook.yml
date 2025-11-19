@@ -1,0 +1,16 @@
+---
+- hosts: all
+  become: true
+
+  vars:
+    user_name: "{{ user_name | default('ubuntu') }}"
+
+  roles:
+    - docker
+    - kubectl
+    - minikube
+    
+
+    
+
+    

@@ -1,0 +1,12 @@
+- name: Download Minikube
+  get_url:
+    url: https://storage.googleapis.com/minikube/releases/latest/minikube-linux-amd64
+    dest: /tmp/minikube-linux-amd64
+    mode: '0755'
+
+- name: Install Minikube
+  copy:
+    src: /tmp/minikube-linux-amd64
+    dest: /usr/local/bin/minikube
+    remote_src: yes
+    mode: '0755'
