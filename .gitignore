@@ -2,6 +2,7 @@
 .terraform/
 terraform.tfstate
 terraform.tfstate.backup
+terraform.tfstate*
 crash.log
 
 # Ignore override files
@@ -14,3 +15,5 @@ crash.log
 .DS_Store
 .idea/
 .vscode/
+
+ansible/*.zip

@@ -1,18 +1,25 @@
-- name: Get latest stable version of kubectl
-  shell: curl -L -s https://dl.k8s.io/release/stable.txt
-  register: kubectl_latest
-
-- name: Download kubectl binary
-  ansible.builtin.get_url:
-    url: "https://dl.k8s.io/{{ kubectl_latest.stdout }}/bin/linux/amd64/kubectl"
-    dest: "/tmp/kubectl"
+- name: Install kubectl
+  get_url:
+    url: "https://dl.k8s.io/release/{{ kubectl_version }}/bin/linux/amd64/kubectl"
+    dest: /usr/local/bin/kubectl
     mode: '0755'
+  # notify: verify kubectl
+  
+# - name: Get latest stable version of kubectl
+#   shell: curl -L -s https://dl.k8s.io/release/stable.txt
+#   register: kubectl_latest
 
-- name: Move kubectl to install directory
-  ansible.builtin.copy:
-    src: "/tmp/kubectl"
-    dest: "/usr/local/bin/kubectl"
-    owner: root
-    group: root
-    mode: '0755'
-    remote_src: yes
+# - name: Download kubectl binary
+#   ansible.builtin.get_url:
+#     url: "https://dl.k8s.io/{{ kubectl_latest.stdout }}/bin/linux/amd64/kubectl"
+#     dest: "/tmp/kubectl"
+#     mode: '0755'
+
+# - name: Move kubectl to install directory
+#   ansible.builtin.copy:
+#     src: "/tmp/kubectl"
+#     dest: "/usr/local/bin/kubectl"
+#     owner: root
+#     group: root
+#     mode: '0755'
+#     remote_src: yes

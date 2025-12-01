@@ -26,6 +26,8 @@
           - containerd.io
         state: latest
         update_cache: true
+      notify: 
+        - restart docker
 
     - name: Enable and start Docker
       systemd:

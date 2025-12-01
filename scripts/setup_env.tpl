@@ -7,14 +7,23 @@ apt update -y
 # ansible
 apt install software-properties-common -y
 add-apt-repository --yes --update ppa:ansible/ansible
-apt install ansible -y
+apt install ansible unzip -y
+
+# temp folder
+mkdir -p /tmp/roles
+mkdir -p /etc/ansible/roles
+
+cat > /tmp/roles.zip <<EOF
+${roles_archive}
+EOF
+base64 -d /tmp/roles.zip > /tmp/roles_decoded.zip
+unzip -o /tmp/roles_decoded.zip -d /tmp/roles
+
 
 cat > /tmp/playbook.yml <<"EOF"
 ${playbook_data}
 EOF
 
-mkdir -p /etc/ansible/roles
-cp -R /tmp/roles/* /etc/ansible/roles/
 
 # Executes playbook locally
 ansible-playbook -i "localhost," -c local /tmp/playbook.yml --extra-vars "user_name=${user_name}"
