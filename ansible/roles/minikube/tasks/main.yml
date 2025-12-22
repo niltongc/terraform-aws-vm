@@ -1,12 +1,33 @@
 - name: Download Minikube
-  get_url:
+  ansible.builtin.get_url:
     url: https://storage.googleapis.com/minikube/releases/latest/minikube-linux-amd64
     dest: /tmp/minikube-linux-amd64
     mode: '0755'
 
 - name: Install Minikube
-  copy:
+  ansible.builtin.copy:
     src: /tmp/minikube-linux-amd64
     dest: /usr/local/bin/minikube
     remote_src: yes
     mode: '0755'
+
+- name: Start Minikube
+  ansible.builtin.shell: minikube start --driver=docker --profile minikube --force
+  args:
+    creates: "/home/{{ user_name }}/.minikube"
+  environment:
+    HOME: "/home/{{ user_name }}"
+
+- name: Verify Minikube status
+  ansible.builtin.shell: minikube status --profile minikube
+  register: minikube_status
+  failed_when: false
+  become: false
+  environment:
+    HOME: "/home/{{ user_name }}"
+
+
+- name: Show Minikube status
+  ansible.builtin.debug:
+    var: minikube_status.stdout_lines
+

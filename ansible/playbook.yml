@@ -3,7 +3,7 @@
   become: true
 
   vars:
-    user_name: "{{ user_name | default('ubuntu') }}"
+    user_name: "ubuntu"
     kubectl_version: "v1.28.0"
 
   roles:

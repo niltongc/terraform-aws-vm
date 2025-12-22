@@ -81,11 +81,11 @@ resource "aws_key_pair" "default" {
   public_key = file("~/.ssh/aws_gen.pub")
 }
 
-data "archive_file" "roles" {
-  type        = "zip"
-  source_dir  = "${path.module}/ansible/roles"
-  output_path = "${path.module}/ansible/roles.zip"
-}
+# data "archive_file" "roles" {
+#   type        = "zip"
+#   source_dir  = "${path.module}/ansible/roles"
+#   output_path = "${path.module}/ansible/roles.zip"
+# }
 
 
 resource "aws_instance" "web" {
@@ -95,17 +95,41 @@ resource "aws_instance" "web" {
   vpc_security_group_ids = [aws_security_group.subnet_security_group.id]
   key_name               = aws_key_pair.default.key_name
 
-  user_data = templatefile("${path.module}/scripts/setup_env.tpl", {
-    user_name     = var.user_name
-    playbook_data = file("${path.module}/ansible/playbook.yml")
-    roles_archive = filebase64(data.archive_file.roles.output_path)
-  })
+  # user_data = templatefile("${path.module}/scripts/setup_env.tpl", {
+  #   user_name     = var.user_name
+  #   playbook_data = file("${path.module}/ansible/playbook.yml")
+  #   roles_archive = filebase64(data.archive_file.roles.output_path)
+  # })
 
 
   tags = {
     Name = "VmTest"
   }
 }
+
+resource "null_resource" "ansible_provision" {
+  depends_on = [aws_instance.web]
+
+  provisioner "local-exec" {
+    command = <<EOT
+   
+      until nc -z -v -w30 ${aws_instance.web.public_ip} 22; do
+        echo "Waiting for SSH..."
+        sleep 5
+      done
+
+      ANSIBLE_HOST_KEY_CHECKING=False \
+      ansible-playbook \
+        -i '${aws_instance.web.public_ip},' \
+        -u ubuntu \
+        --private-key ${var.private_key_path} \
+        ${path.module}/ansible/playbook.yml \
+        --extra-vars "user_name=${var.user_name}"
+    EOT
+  }
+}
+
+
 
 output "public_ip" {
   value = aws_instance.web.public_ip
