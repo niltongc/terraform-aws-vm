@@ -40,3 +40,9 @@
         name: "{{ user_name }}"
         groups: docker
         append: yes
+
+    - name: Wait until Docker socket is ready
+      ansible.builtin.wait_for:
+        path: /var/run/docker.sock
+        state: present
+        timeout: 60

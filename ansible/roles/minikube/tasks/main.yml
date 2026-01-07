@@ -11,12 +11,42 @@
     remote_src: yes
     mode: '0755'
 
+- name: Ensure ~/.minikube and ~/.kube directories exist and have correct permissions
+  ansible.builtin.file:
+    path: "{{ item }}"
+    state: directory
+    owner: "{{ user_name }}"
+    group: "{{ user_name }}"
+    mode: '0755'
+  loop:
+    - "/home/{{ user_name }}/.minikube"
+    - "/home/{{ user_name }}/.kube"
+
+# - name: Start Minikube
+  # ansible.builtin.shell: minikube start --driver=docker --profile minikube --force
+  # args:
+  #   creates: "/home/{{ user_name }}/.minikube"
+  # environment:
+  #   HOME: "/home/{{ user_name }}"
+  # become: false   # importante!
+  # become_user: "{{ user_name }}"  # opcional, se quiser garantir que rode como ubuntu
+
+
 - name: Start Minikube
   ansible.builtin.shell: minikube start --driver=docker --profile minikube --force
-  args:
-    creates: "/home/{{ user_name }}/.minikube"
   environment:
     HOME: "/home/{{ user_name }}"
+  become: false
+
+- name: Wait until Minikube is running
+  ansible.builtin.shell: |
+    until minikube status --profile minikube | grep -q "host: Running"; do
+      sleep 5
+    done
+  environment:
+    HOME: "/home/{{ user_name }}"
+  become: false
+
 
 - name: Verify Minikube status
   ansible.builtin.shell: minikube status --profile minikube

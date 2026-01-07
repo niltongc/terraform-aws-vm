@@ -1,0 +1,45 @@
+- name: Install git
+  ansible.builtin.apt:
+    name: git
+    state: present
+    update_cache: true
+
+- name: Clone kubernetes repo
+  ansible.builtin.git:
+    repo: "{{ github_repo }}"
+    dest: "{{ repo_dest }}"
+    version: main
+    force: true
+  become_user: "{{ user_name }}"
+
+- name: Create monitoring namespace
+  ansible.builtin.command:
+    cmd: kubectl create namespace monitoring
+  environment:
+    KUBECONFIG: /home/ubuntu/.kube/config
+  become_user: ubuntu
+  register: monitoring_ns
+  failed_when: false
+  changed_when: "'created' in monitoring_ns.stdout"
+
+- name: Create vshop namespace
+  ansible.builtin.command:
+    cmd: kubectl create namespace vshop
+  environment:
+    KUBECONFIG: /home/ubuntu/.kube/config
+  become_user: ubuntu
+  register: vshop_ns
+  failed_when: false
+  changed_when: "'created' in vshop_ns.stdout"
+
+
+- name: Apply kubernetes manifests
+  ansible.builtin.shell: |
+    kubectl apply -f grafana/
+    kubectl apply -f prometheus/
+    kubectl apply -f sqlserver/
+    kubectl apply -f vshop-product-api/
+    kubectl apply -f vshop-web-ui/
+  args:
+    chdir: /home/ubuntu/kubernetes-deployment/kubernetes-deployment
+  become_user: "{{ user_name }}"

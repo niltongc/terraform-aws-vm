@@ -1,0 +1,47 @@
+- name: Install k3s
+  ansible.builtin.shell: curl -sfL https://get.k3s.io | sh -s - --write-kubeconfig-mode 644
+  become: true
+
+- name: Create link kubectl
+  ansible.builtin.file:
+    src: /usr/local/bin/k3s
+    dest: /usr/local/bin/kubectl
+    state: link
+    force: yes
+  become: true
+
+- name: Ensure ~/.kube exists
+  ansible.builtin.file:
+    path: "/home/{{ user_name }}/.kube"
+    state: directory
+    owner: "{{ user_name }}"
+    group: "{{ user_name }}"
+    mode: '0755'
+  become: true
+
+- name: Copy kubeconfig to user
+  ansible.builtin.copy:
+    src: /etc/rancher/k3s/k3s.yaml
+    dest: "/home/{{ user_name }}/.kube/config"
+    owner: "{{ user_name }}"
+    group: "{{ user_name }}"
+    mode: '0644'
+    remote_src: yes
+  become: true
+
+- name: Set KUBECONFIG environment variable for the user
+  ansible.builtin.lineinfile:
+    path: "/home/{{ user_name }}/.bashrc"
+    line: 'export KUBECONFIG=$HOME/.kube/config'
+    create: yes
+    state: present
+  become: true
+  become_user: "{{ user_name }}"
+
+- name: Reload .bashrc for user
+  ansible.builtin.shell: "source /home/{{ user_name }}/.bashrc"
+  args:
+    executable: /bin/bash
+  become: true
+  become_user: "{{ user_name }}"
+  ignore_errors: true  # só para não falhar na execução do playbook

@@ -50,6 +50,19 @@ resource "aws_security_group" "subnet_security_group" {
     to_port     = 22
     protocol    = "tcp"
   }
+  ingress {
+    cidr_blocks = ["0.0.0.0/0"]
+    from_port   = 30000
+    to_port     = 34000
+    protocol    = "tcp"
+  }
+  ingress {
+    cidr_blocks = ["0.0.0.0/0"]
+    from_port   = 80
+    to_port     = 80
+    protocol    = "tcp"
+  }
+
 
   egress {
     from_port   = 0
@@ -94,6 +107,11 @@ resource "aws_instance" "web" {
   subnet_id              = aws_subnet.new_subnet.id
   vpc_security_group_ids = [aws_security_group.subnet_security_group.id]
   key_name               = aws_key_pair.default.key_name
+
+  root_block_device {
+    volume_size = 20
+    volume_type = "gp3"
+  }
 
   # user_data = templatefile("${path.module}/scripts/setup_env.tpl", {
   #   user_name     = var.user_name

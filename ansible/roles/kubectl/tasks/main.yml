@@ -3,6 +3,19 @@
     url: "https://dl.k8s.io/release/{{ kubectl_version }}/bin/linux/amd64/kubectl"
     dest: /usr/local/bin/kubectl
     mode: '0755'
+
+# - name: Configurar KUBECONFIG
+#   ansible.builtin.shell: export KUBECONFIG=/home/{{ user_name }}/.kube/config
+#   environment:
+#     KUBECONFIG: "/home/{{ user_name }}/.kube/config"
+#   become: false
+
+
+# - name: Install kubectl
+#   get_url:
+#     url: "https://dl.k8s.io/release/{{ kubectl_version }}/bin/linux/amd64/kubectl"
+#     dest: /usr/local/bin/kubectl
+#     mode: '0755'
   # notify: verify kubectl
   
 # - name: Get latest stable version of kubectl

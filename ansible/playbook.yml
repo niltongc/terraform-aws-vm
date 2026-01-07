@@ -5,11 +5,15 @@
   vars:
     user_name: "ubuntu"
     kubectl_version: "v1.28.0"
+    github_repo: "https://github.com/niltongc/dotnet-microservices-virtualshop"
+    repo_dest: "/home/ubuntu/kubernetes-deployment"
 
   roles:
     - docker
-    - kubectl
-    - minikube
+    - k3s
+    # - kubectl
+    # - minikube
+    - k8s-deploy
     
 
     
