@@ -94,12 +94,6 @@ resource "aws_key_pair" "default" {
   public_key = file("~/.ssh/aws_gen.pub")
 }
 
-# data "archive_file" "roles" {
-#   type        = "zip"
-#   source_dir  = "${path.module}/ansible/roles"
-#   output_path = "${path.module}/ansible/roles.zip"
-# }
-
 
 resource "aws_instance" "web" {
   ami                    = data.aws_ami.ubuntu.id
@@ -112,12 +106,6 @@ resource "aws_instance" "web" {
     volume_size = 20
     volume_type = "gp3"
   }
-
-  # user_data = templatefile("${path.module}/scripts/setup_env.tpl", {
-  #   user_name     = var.user_name
-  #   playbook_data = file("${path.module}/ansible/playbook.yml")
-  #   roles_archive = filebase64(data.archive_file.roles.output_path)
-  # })
 
 
   tags = {

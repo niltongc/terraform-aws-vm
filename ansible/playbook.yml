@@ -11,8 +11,6 @@
   roles:
     - docker
     - k3s
-    # - kubectl
-    # - minikube
     - k8s-deploy
     
 

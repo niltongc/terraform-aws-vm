@@ -1,2 +1,0 @@
-- name: verify kubectl
-  command: kubectl version --client
